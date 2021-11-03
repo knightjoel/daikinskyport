@@ -143,20 +143,6 @@ async def async_setup_entry(
                                       "power", "frequency_percent","actual_status",
                                       "airflow", "rpm") or sensor["value"] == 127.5 or sensor["value"] == 65535:
                 continue
-
-            # Manage values that indidcate a comms failure to the hardware.
-            # Correct these values to something that doesn't skew the
-            # graphs so badly.
-            if (sensor["type"] in ("actual_status", "demand",
-                                   "frequency_percent")
-                    and sensor["value"] == 127.5):
-                sensor["value"] = None
-            elif (sensor["type"] in ("power", "rpm")
-                    and sensor["value"] == 65535):
-                sensor["value"] = None
-            elif sensor["type"] == "temperature" and sensor["value"] == 255:
-                sensor["value"] = None
-
             async_add_entities([DaikinSkyportSensor(coordinator, sensor["name"], sensor["type"], index)], True)
 
 class DaikinSkyportSensor(SensorEntity):
@@ -213,4 +199,17 @@ class DaikinSkyportSensor(SensorEntity):
         sensors = self.data.daikinskyport.get_sensors(self._index)
         for sensor in sensors:
             if sensor["type"] == self._type and self._sensor_name == sensor["name"]:
-                self._state = sensor["value"]
+                # Manage values that indidcate a comms failure to the hardware.
+                # Correct these values to something that doesn't skew the
+                # graphs so badly.
+                if (sensor["type"] in ("actual_status", "demand",
+                                       "frequency_percent")
+                        and sensor["value"] == 127.5):
+                    self._state = None
+                elif (sensor["type"] in ("power", "rpm")
+                        and sensor["value"] == 65535):
+                    self._state = None
+                elif sensor["type"] == "temperature" and sensor["value"] == 255:
+                    self._state = None
+                else:
+                    self._state = sensor["value"]
