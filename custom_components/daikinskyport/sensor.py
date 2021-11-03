@@ -160,20 +160,6 @@ async def async_setup_entry(
                 or sensor["value"] == 65535
             ):
                 continue
-
-            # Manage values that indidcate a comms failure to the hardware.
-            # Correct these values to something that doesn't skew the
-            # graphs so badly.
-            if (
-                sensor["type"] in ("actual_status", "demand", "frequency_percent")
-                and sensor["value"] == 127.5
-            ):
-                sensor["value"] = None
-            elif sensor["type"] in ("power", "rpm") and sensor["value"] == 65535:
-                sensor["value"] = None
-            elif sensor["type"] == "temperature" and sensor["value"] == 255:
-                sensor["value"] = None
-
             async_add_entities(
                 [
                     DaikinSkyportSensor(
@@ -251,5 +237,17 @@ class DaikinSkyportSensor(SensorEntity):
                         continue
                     else:
                         self._state = sensor["value"]
+                # Manage values that indidcate a comms failure to the hardware.
+                # Correct these values to something that doesn't skew the
+                # graphs so badly.
+                elif (
+                    sensor["type"] in ("actual_status", "demand", "frequency_percent")
+                    and sensor["value"] == 127.5
+                ):
+                    self._state = None
+                elif sensor["type"] in ("power", "rpm") and sensor["value"] == 65535:
+                    self._state = None
+                elif sensor["type"] == "temperature" and sensor["value"] == 255:
+                    self._state = None
                 elif not sensor["value"] == 65535 and not sensor["value"] == 655350:
                     self._state = sensor["value"]
