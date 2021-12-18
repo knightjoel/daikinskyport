@@ -562,6 +562,8 @@ class Thermostat(ClimateEntity, RestoreEntity):
     @property
     def native_current_temperature(self) -> float:
         """Return the current temperature."""
+        if self.thermostat["tempIndoor"] == 255:
+            return None
         return self.thermostat["tempIndoor"]
 
     @property
