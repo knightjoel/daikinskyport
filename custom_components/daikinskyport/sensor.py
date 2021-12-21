@@ -199,9 +199,9 @@ class DaikinSkyportSensor(SensorEntity):
         sensors = self.data.daikinskyport.get_sensors(self._index)
         for sensor in sensors:
             if sensor["type"] == self._type and self._sensor_name == sensor["name"]:
-                # Manage values that indidcate a comms failure to the hardware.
-                # Correct these values to something that doesn't skew the
-                # graphs so badly.
+                # Manage values that indicate a comms failure to the hardware.
+                # Avoid reporting these "infinite" values to avoid skewing
+                # historical data and trends.
                 if (sensor["type"] in ("actual_status", "demand",
                                        "frequency_percent")
                         and sensor["value"] == 127.5):
