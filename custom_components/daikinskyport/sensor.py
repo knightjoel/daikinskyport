@@ -32,6 +32,7 @@ DEVICE_CLASS_DEMAND = "demand"
 DEVICE_CLASS_FREQ_PERCENT = "frequency in percent"
 DEVICE_CLASS_ACTUAL_STATUS = "actual"
 DEVICE_CLASS_AIR_FLOW = "airflow"
+DEVICE_CLASS_RPM = "RPM"
 
 SENSOR_TYPES = {
     "temperature": {
@@ -118,6 +119,12 @@ SENSOR_TYPES = {
         "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:air-filter",
     },
+    "rpm": {
+        "device_class": DEVICE_CLASS_RPM,
+        "native_unit_of_measurement": "RPM",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "icon": "mdi:fan",
+    },
 }
 
 async def async_setup_entry(
@@ -134,7 +141,7 @@ async def async_setup_entry(
             if sensor["type"] not in ("temperature", "humidity", "score",
                                       "ozone", "particle", "VOC", "demand",
                                       "power", "frequency_percent","actual_status",
-                                      "airflow") or sensor["value"] == 127.5 or sensor["value"] == 65535:
+                                      "airflow", "rpm") or sensor["value"] == 127.5 or sensor["value"] == 65535:
                 continue
             async_add_entities([DaikinSkyportSensor(coordinator, sensor["name"], sensor["type"], index)], True)
 
