@@ -312,6 +312,14 @@ class DaikinSkyport(object):
                     "type": "power",
                 }
             )
+        if "ctOutdoorFanRPM" in thermostat:
+            sensors.append(
+                {
+                    "name": f"{name} Outdoor fan",
+                    "value": thermostat["ctOutdoorFanRPM"],
+                    "type": "rpm",
+                }
+            )
         if "ctOutdoorFrequencyInPercent" in thermostat:
             sensors.append(
                 {
